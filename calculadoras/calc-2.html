@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador PGBL vs CDB</title>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/enhanced-charts.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-dark text-light">
+    <!-- Navbar (será carregado via JavaScript) -->
+    <div id="navbar-container"></div>
+
+    <div class="container">
+        <h1>Simulador PGBL vs CDB <i class="fas fa-piggy-bank"></i></h1>
+         
+        <div class="educational-tips">
+            <h3>Entenda a Comparação <span class="help-icon" onclick="toggleTips()">?</span></h3>
+            <div id="tipsContent" class="concept-explanation" style="display: none;">
+                <h4><i>PGBL vs CDB: Principais Diferenças</i></h4>
+                <ul>
+                    <li><strong>PGBL:</strong> Permite deduzir até 12% da renda tributável no Imposto de Renda, mas no resgate, o imposto incide sobre o valor total (principal + rendimentos).</li>
+                    <li><strong>CDB:</strong> Não oferece benefício fiscal imediato, mas no resgate o imposto incide apenas sobre os rendimentos.</li>
+                    <li><strong>Alíquotas de IR:</strong> 
+                        <ul>
+                            <li><strong>PGBL:</strong> De 10% a 35% dependendo do prazo de acumulação e tipo de resgate.</li>
+                            <li><strong>CDB:</strong> De 15% a 22,5% conforme o prazo do investimento (tabela regressiva).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Perfil Ideal:</strong> PGBL tende a ser mais vantajoso para contribuintes que fazem declaração completa do IR e têm horizonte longo de investimento.</li>
+                </ul>
+            </div>
+        </div>
+         
+         <form id="simulador" class="mt-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="rendaTributavel">Renda Anual Tributável (R$):</label>
+                        <input type="number" id="rendaTributavel" class="form-control" value="120000" step="0.01" required>
+                        <div class="instruction">Informe sua renda anual sujeita à tributação no IR.</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="aporteInicial">Aporte Inicial (opcional) - R$:</label>
+                        <input type="number" id="aporteInicial" class="form-control" step="0.01" value="0">
+                        <div class="instruction">Valor que você já possui para iniciar o investimento.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="anos">Período de Investimento (em anos):</label>
+                        <input type="number" id="anos" class="form-control" value="15" required min="1">
+                        <div class="instruction">Quanto tempo pretende manter o investimento.</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="cdi">Taxa do CDI Anual (%):</label>
+                        <input type="number" id="cdi" class="form-control" step="0.01" value="10" required min="0">
+                        <div class="instruction">Taxa de referência do mercado financeiro.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="taxaAdministracao">Taxa de Administração PGBL (% a.a.):</label>
+                        <input type="number" id="taxaAdministracao" class="form-control" step="0.01" value="1.5" required min="0">
+                        <div class="instruction">Taxa cobrada pela instituição financeira para gerenciar o PGBL.</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="aliquotaIR_PGBL">Alíquota IR no Resgate do PGBL (%):</label>
+                        <select id="aliquotaIR_PGBL" class="form-control">
+                            <option value="10">10% (Acima de 10 anos)</option>
+                            <option value="15">15% (8 a 10 anos)</option>
+                            <option value="20">20% (6 a 8 anos)</option>
+                            <option value="25">25% (4 a 6 anos)</option>
+                            <option value="30">30% (2 a 4 anos)</option>
+                            <option value="35">35% (Até 2 anos)</option>
+                        </select>
+                        <div class="instruction">Conforme regras da Receita Federal para previdência.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="button" onclick="calcular()" class="btn btn-primary mt-3">Simular <i class="fas fa-calculator"></i></button>
+            
+            <div class="alert alert-primary mt-3">
+                <i class="fas fa-info-circle"></i> Esta simulação considera que você realiza declaração completa do Imposto de Renda e pode deduzir contribuições para PGBL até o limite de 12% da renda tributável.
+            </div>
+        </form>
+       
+        <div class="results" id="resultados" style="display: none;">
+             <h2>Resultados da Simulação <i class="fas fa-chart-line"></i></h2>
+             
+             <div class="row">
+                <div class="col-md-6">
+                    <div class="card bg-dark mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h3 class="card-title h5">PGBL</h3>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Valor Total Acumulado:</strong> <span id="pgblAcumulado"></span></p>
+                            <p><strong>Desembolso Efetivo:</strong> <span id="pgblDesembolso"></span></p>
+                            <p><strong>IR no Resgate:</strong> <span id="pgblIR"></span></p>
+                            <p><strong>Valor Líquido:</strong> <span id="pgblLiquido"></span></p>
+                            <p><strong>Taxa de Administração Total:</strong> <span id="pgblTaxaAdm"></span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card bg-dark mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h3 class="card-title h5">CDB</h3>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Valor Total Acumulado:</strong> <span id="cdbAcumulado"></span></p>
+                            <p><strong>Desembolso Efetivo:</strong> <span id="cdbDesembolso"></span></p>
+                            <p><strong>IR no Resgate:</strong> <span id="cdbIR"></span></p>
+                            <p><strong>Valor Líquido:</strong> <span id="cdbLiquido"></span></p>
+                        </div>
+                    </div>
+                </div>
+             </div>
+             
+             <div class="chart-container mt-4">
+                <canvas id="chartComparativo"></canvas>
+             </div>
+             
+             <h3 class="mt-4">Detalhamento Anual <i class="fas fa-table"></i></h3>
+             <div class="table-responsive">
+                <table id="tabelaDetalhes" class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Ano</th>
+                            <th>Aporte PGBL (R$)</th>
+                            <th>Restituição PGBL (R$)</th>
+                            <th>Saldo PGBL (R$)</th>
+                            <th>Aporte CDB (R$)</th>
+                            <th>Saldo CDB (R$)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- As linhas serão preenchidas pelo JavaScript -->
+                    </tbody>
+                </table>
+             </div>
+             
+             <div class="card bg-dark mb-4 mt-4">
+                <div class="card-header">
+                    <h3 class="card-title h5">Análise Comparativa <i class="fas fa-balance-scale"></i></h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>Diferença Líquida (PGBL - CDB):</strong> <span id="diferencaLiquida"></span></p>
+                    <p><strong>Benefício Fiscal Total:</strong> <span id="totalRestituido"></span></p>
+                    <p><strong>Rentabilidade Líquida PGBL:</strong> <span id="rentabilidadePGBL"></span></p>
+                    <p><strong>Rentabilidade Líquida CDB:</strong> <span id="rentabilidadeCDB"></span></p>
+                    
+                    <div class="alert mt-3" id="recomendacaoAlert">
+                        <strong>Recomendação:</strong> <span id="recomendacao"></span>
+                    </div>
+                </div>
+             </div>
+         </div>
+    </div>
+
+    <!-- Footer (será carregado via JavaScript) -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/chart-helpers.js"></script>
+    <script src="../assets/js/fix-charts.js"></script>
+    <script src="../assets/js/pgbl-cdb-fix.js?v=1.0.2"></script>
+    <script>
+        // Funções de ajuda UI
+        function toggleTips() {
+            const tipsContent = document.getElementById('tipsContent');
+            tipsContent.style.display = tipsContent.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Executar simulação automática quando solicitado
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar se há parâmetro 'auto' na URL para simulação automática
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('auto')) {
+                setTimeout(() => {
+                    if (typeof calcular === 'function') {
+                        calcular();
+                    }
+                }, 800);
+            }
+        });
+    </script>
+</body>
+</html>
