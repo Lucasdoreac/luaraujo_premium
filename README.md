@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Luaraujo Calculadoras Financeiras
 
 Este repositório contém as calculadoras financeiras educativas do site luaraujo.com. As calculadoras fornecem simulações e análises financeiras para ajudar os visitantes a tomar decisões de investimento mais informadas.
@@ -682,4 +681,4 @@ O projeto deve manter a qualidade e funcionalidade das calculadoras existentes, 
 A autenticação leve e integração com Hotmart permitirão monetizar o conteúdo sem a necessidade de implementar sistemas complexos de pagamento próprios, enquanto a venda de livros via Amazon fornecerá uma fonte adicional de receita.
 
 O blog servirá como estratégia de atração de tráfego orgânico, direcionando visitantes para os produtos à venda e versões demo das calculadoras.
->>>>>>> eca221ef8c279ef8b3f5282034633df9cde9045a
+
